@@ -1,26 +1,190 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import axios from "axios";
+import Footer from "./Footer";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      users: [],
+      id: 0,
+      name: "",
+      ubicacion: "",
+      telefono: "",
+    };
+  }
+
+  componentDidMount() {
+    axios.get("https://polar-mountain-90943.herokuapp.com/api").then((res) => {
+      this.setState({
+        users: res.data,
+        id: 0,
+        name: "",
+        ubicacion: "",
+        telefono: "",
+      });
+    });
+  }
+
+  namechange = (event) => {
+    this.setState({
+      name: event.target.value,
+    });
+  };
+  ubicacionchange = (event) => {
+    this.setState({
+      ubicacion: event.target.value,
+    });
+  };
+  telefonochange = (event) => {
+    this.setState({
+      telefono: event.target.value,
+    });
+  };
+
+  submit(event, id) {
+    event.preventDefault();
+    if (id === 0) {
+      axios
+        .post("https://polar-mountain-90943.herokuapp.com/api", {
+          name: this.state.name,
+          ubicacion: this.state.ubicacion,
+          telefono: this.state.telefono,
+        })
+        .then(() => {
+          this.componentDidMount();
+        });
+    } else {
+      axios
+        .put(`https://polar-mountain-90943.herokuapp.com/api/${id}`, {
+          name: this.state.name,
+          ubicacion: this.state.ubicacion,
+          telefono: this.state.telefono,
+        })
+        .then(() => {
+          this.componentDidMount();
+        });
+    }
+  }
+  delete(id) {
+    axios
+      .delete(`https://polar-mountain-90943.herokuapp.com/api/${id}`)
+      .then(() => {
+        this.componentDidMount();
+      });
+  }
+
+  edit(id) {
+    axios
+      .get(`https://polar-mountain-90943.herokuapp.com/api/${id}`)
+      .then((res) => {
+        this.setState({
+          id: res.data._id,
+          name: res.data.name,
+          ubicacion: res.data.ubicacion,
+          telefono: res.data.telefono,
+        });
+      });
+  }
+
+  render() {
+    return (
+      <>
+        <div className="container">
+          <h5>Administrador de Fiscalías</h5>
+          <div className="row">
+            <div className="col s6">
+              <form onSubmit={(e) => this.submit(e, this.state.id)}>
+                <div className="input-field col s12">
+                  <i className="material-icons prefix">assignment_ind</i>
+                  <input
+                    type="text"
+                    id="autocomplete-input"
+                    className="autocomplete"
+                    value={this.state.name}
+                    onChange={(e) => this.namechange(e)}
+                  />
+                  <label htmlFor="autocomplete-input">Nombre Fiscalía</label>
+                </div>
+                <div className="input-field col s12">
+                  <i className="material-icons prefix">gps_fixed</i>
+                  <input
+                    type="text"
+                    id="autocomplete-input"
+                    value={this.state.ubicacion}
+                    className="autocomplete"
+                    onChange={(e) => this.ubicacionchange(e)}
+                  />
+                  <label htmlFor="autocomplete-input">Ubicación</label>
+                </div>
+                <div className="input-field col s12">
+                  <i className="material-icons prefix">local_phone</i>
+                  <input
+                    type="number"
+                    id="autocomplete-input"
+                    value={this.state.telefono}
+                    className="autocomplete"
+                    onChange={(e) => this.telefonochange(e)}
+                  />
+                  <label htmlFor="autocomplete-input">Teléfono</label>
+                </div>
+                <button
+                  className="btn waves-effect waves-light right indigo"
+                  type="submit"
+                  name="action">
+                  Agregar Fiscalía
+                  <i className="material-icons right">send</i>
+                </button>
+              </form>
+            </div>
+            <div className="col s6">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nombre Fiscalía</th>
+                    <th>Ubicación</th>
+                    <th>Teléfono</th>
+                    <th>Editar</th>
+                    <th>Borrar</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {this.state.users.map((user) => (
+                    <tr key={user._id}>
+                      <td>{user.name}</td>
+                      <td>{user.ubicacion}</td>
+                      <td>{user.telefono}</td>
+                      <td>
+                        <button
+                          className="btn waves-effect waves-light indigo"
+                          type="submit"
+                          name="action"
+                          onClick={(e) => this.edit(user._id)}>
+                          <i className="material-icons">edit</i>
+                        </button>
+                      </td>
+                      <td>
+                        <button
+                          className="btn waves-effect waves-light indigo"
+                          type="submit"
+                          name="action"
+                          onClick={(e) => this.delete(user._id)}>
+                          <i className="material-icons">delete</i>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <br />
+        <Footer />
+      </>
+    );
+  }
 }
 
 export default App;
