@@ -25,7 +25,7 @@ class App extends React.Component {
       });
     });
   }
-
+  // Funciones para capturar el valor de los inputs y actualizar el estado
   namechange = (event) => {
     this.setState({
       name: event.target.value,
@@ -42,9 +42,11 @@ class App extends React.Component {
     });
   };
 
+  // Cuando el formulario se envia
   submit(event, id) {
     event.preventDefault();
     if (id === 0) {
+      // Crear Registros en la BD
       axios
         .post("https://polar-mountain-90943.herokuapp.com/api", {
           name: this.state.name,
@@ -55,6 +57,7 @@ class App extends React.Component {
           this.componentDidMount();
         });
     } else {
+      // Actualizar Registros en la BD
       axios
         .put(`https://polar-mountain-90943.herokuapp.com/api/${id}`, {
           name: this.state.name,
@@ -67,6 +70,7 @@ class App extends React.Component {
     }
   }
   delete(id) {
+    // Borrar Registros en la BD
     axios
       .delete(`https://polar-mountain-90943.herokuapp.com/api/${id}`)
       .then(() => {
@@ -75,6 +79,7 @@ class App extends React.Component {
   }
 
   edit(id) {
+    // Obtengo el id, name, ubicacion, telefono del registro seleccionado
     axios
       .get(`https://polar-mountain-90943.herokuapp.com/api/${id}`)
       .then((res) => {
@@ -91,10 +96,12 @@ class App extends React.Component {
     return (
       <>
         <div className="container">
-          <h5>Administrador de Fiscalías</h5>
+          <h5 className="indigo-text">Administrador de Fiscalías</h5>
           <div className="row">
             <div className="col s6">
-              <form onSubmit={(e) => this.submit(e, this.state.id)}>
+              <form
+                onSubmit={(e) => this.submit(e, this.state.id)}
+                autocomplete="off">
                 <div className="input-field col s12">
                   <i className="material-icons prefix">assignment_ind</i>
                   <input
@@ -138,8 +145,9 @@ class App extends React.Component {
               </form>
             </div>
             <div className="col s6">
+              <h5 className="indigo-text">Fiscalías Disponibles</h5>
               <table>
-                <thead>
+                <thead className="indigo-text">
                   <tr>
                     <th>Nombre Fiscalía</th>
                     <th>Ubicación</th>
